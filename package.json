@@ -1,0 +1,38 @@
+{
+  "name": "react-aws-iot",
+  "version": "2.0.0",
+  "description": "Hooks interface for AWS MQTT over IOT service",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --config webpack.config.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rhdeck/react-aws-iot.git"
+  },
+  "keywords": [
+    "react",
+    "aws",
+    "iot",
+    "mqtt"
+  ],
+  "author": "Ray Deck",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/rhdeck/react-aws-iot/issues"
+  },
+  "homepage": "https://github.com/rhdeck/react-aws-iot#readme",
+  "peerDependencies": {
+    "react": "*"
+  },
+  "dependencies": {
+    "minimatch": "^3.0.4"
+  },
+  "devDependencies": {
+    "aws-iot-device-sdk": "^2.2.1",
+    "uglify-js": "^3.4.9",
+    "webpack": "^4.18.0",
+    "webpack-cli": "^3.1.0"
+  }
+}
