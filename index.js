@@ -44,7 +44,7 @@ const AWSIOTProvider = ({ children }) => {
     });
     setClient(client);
     return () => client.close();
-  }, [region, accessKey, secretKey, sessionToken, host]);
+  }, [region, accessKey, secretKey, sessionToken, host, iotTopic]);
   useEffect(() => {
     setValue({
       setRegion,
@@ -58,7 +58,7 @@ const AWSIOTProvider = ({ children }) => {
       send,
       error
     });
-  }, [status, message]);
+  }, [status, message, error]);
   return <Provider value={value}>{children}</Provider>;
 };
 const useIOT = filter => {
