@@ -45,6 +45,7 @@ const DataFetchingComponent = () => {
 ```js
 import { useIOT } from "react-aws-iot";
 const MessageAwareComponent = () => {
-  const filteredIOT = useIOT();
+  const { message, send, error, status } = useIOT();
+  const { message: filteredMessage } = useIOT("myprefix: *");
 };
 ```
