@@ -1,6 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 import { device } from "./aws-iot-device-sdk-js-react-native";
-import micromatch from "micromatch";
 const context = createContext({});
 const { Provider } = context;
 const port = 443;
@@ -65,9 +64,9 @@ const useIOT = filter => {
   const { message: oldMessage, status, send, error } = useContext(context);
   const [message, setMessage] = useState(null);
   useEffect(() => {
-    if (!filter || micromatch(oldMessage, filter).isMatch())
-      setMessage(oldMessage);
-    else setMessage(null);
+    // if (!filter || micromatch(oldMessage, filter).isMatch())
+    setMessage(oldMessage);
+    // else setMessage(null);
   }, [oldMessage]);
   return { message, status, send, error };
 };
