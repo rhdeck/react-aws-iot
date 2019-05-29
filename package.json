@@ -27,7 +27,7 @@
     "react": "*"
   },
   "dependencies": {
-    "minimatch": "^3.0.4"
+    "micromatch": "^4.0.2"
   },
   "devDependencies": {
     "aws-iot-device-sdk": "^2.2.1",
