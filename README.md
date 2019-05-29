@@ -28,7 +28,7 @@ const DataFetchingComponent = () => {
     host,
     iotTopic
   } = data.getMyStuff;
-  useIOTProvider({
+  useIOTSettings({
     region,
     accessKeyId,
     secretKey,
@@ -40,12 +40,11 @@ const DataFetchingComponent = () => {
 };
 ```
 
-3. And where you want to listen for messages, use `useIOT`. Apply a filter if that helps you only listen for the messages that affect you
+3. And where you want to listen for messages, use `useIOT`.
 
 ```js
 import { useIOT } from "react-aws-iot";
 const MessageAwareComponent = () => {
   const { message, send, error, status } = useIOT();
-  const { message: filteredMessage } = useIOT("myprefix: *");
 };
 ```

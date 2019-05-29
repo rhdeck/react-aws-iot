@@ -18,8 +18,20 @@ const AWSIOTProvider = ({ children }) => {
   const [send, setSend] = useState();
   const [error, setError] = useState();
   useEffect(() => {
+    if (
+      !(
+        region &&
+        protocol &&
+        accessKeyId &&
+        secretKey &&
+        sessionToken &&
+        port &&
+        host
+      )
+    )
+      return;
     if (client) client.close();
-    client = device({
+    const newClient = device({
       region,
       protocol,
       accessKeyId,
@@ -28,21 +40,24 @@ const AWSIOTProvider = ({ children }) => {
       port,
       host
     });
-    client.on("connect", () => {
+    newClient.on("connect", () => {
       setStatus("connected");
-      client.subscribe(iotTopic);
+      newClient.subscribe(iotTopic);
     });
-    client.on("error", error => setError(error));
-    client.on("message", (topic, message) => setMessage(message));
-    client.on("close", () => {
+    newClient.on("error", error => setError(error));
+    newClient.on("message", (topic, message) => {
+      console.log("Got message from topic", message, topic);
+      setMessage(message);
+    });
+    newClient.on("close", () => {
       setStatus("closed");
       setClient(null);
     });
     setSend(message => {
-      client.publish(iotTopic, message); // send messages
+      newClient.publish(iotTopic, message); // send messages
     });
-    setClient(client);
-    return () => client.close();
+    setClient(newClient);
+    return () => newClient.close();
   }, [region, accessKeyId, secretKey, sessionToken, host, iotTopic]);
   useEffect(() => {
     setValue({
@@ -77,7 +92,7 @@ const useIOTSettings = ({
   sessionToken,
   host,
   iotTopic
-}) => {
+} = {}) => {
   const {
     setRegion,
     setAccessKeyId,
