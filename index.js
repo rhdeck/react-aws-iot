@@ -31,7 +31,7 @@ const AWSIOTProvider = ({ children }) => {
     )
       return;
     if (client) client.close();
-    const newClient = device({
+    const params = {
       region,
       protocol,
       accessKeyId,
@@ -39,14 +39,14 @@ const AWSIOTProvider = ({ children }) => {
       sessionToken,
       port,
       host
-    });
+    };
+    const newClient = device(params);
     newClient.on("connect", () => {
       setStatus("connected");
       newClient.subscribe(iotTopic);
     });
     newClient.on("error", error => setError(error));
     newClient.on("message", (topic, message) => {
-      console.log("Got message from topic", message, topic);
       setMessage(message);
     });
     newClient.on("close", () => {
@@ -91,7 +91,8 @@ const useIOTSettings = ({
   secretKey,
   sessionToken,
   host,
-  iotTopic
+  iotTopic,
+  topic
 } = {}) => {
   const {
     setRegion,
@@ -106,6 +107,6 @@ const useIOTSettings = ({
   setSecretKey(secretKey);
   setSessionToken(sessionToken);
   setHost(host);
-  setIotTopic(iotTopic);
+  setIotTopic(iotTopic ? iotTopic : topic);
 };
 export { AWSIOTProvider, useIOT, useIOTSettings, context };
