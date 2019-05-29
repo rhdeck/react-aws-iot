@@ -43,7 +43,7 @@ const AWSIOTProvider = ({ children }) => {
     });
     setClient(client);
     return () => client.close();
-  }, [region, accessKey, secretKey, sessionToken, host, iotTopic]);
+  }, [region, accessKeyId, secretKey, sessionToken, host, iotTopic]);
   useEffect(() => {
     setValue({
       setRegion,
