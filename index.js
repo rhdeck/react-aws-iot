@@ -13,6 +13,8 @@ const AWSIOTProvider = ({ children }) => {
   const [iotTopic, setIotTopic] = useState();
   const [status, setStatus] = useState("closed");
   const [message, setMessage] = useState();
+  const [messageText, setMessageText] = useState("");
+  const [messageObj, setMessageObj] = useState(null);
   const [value, setValue] = useState();
   const [client, setClient] = useState();
   const [send, setSend] = useState();
@@ -48,6 +50,13 @@ const AWSIOTProvider = ({ children }) => {
     newClient.on("error", error => setError(error));
     newClient.on("message", (topic, message) => {
       setMessage(message);
+      const text = new TextDecoder().decode(message);
+      setMessageText(text);
+      try {
+        setMessageObj(JSON.parse(text));
+      } catch (e) {
+        setMessageObj(null);
+      }
     });
     newClient.on("close", () => {
       setStatus("closed");
@@ -70,20 +79,29 @@ const AWSIOTProvider = ({ children }) => {
       message,
       status,
       send,
-      error
+      error,
+      messageObj,
+      messageText
     });
-  }, [status, message, error]);
+  }, [status, message, error, messageObj, messageText]);
   return <Provider value={value}>{children}</Provider>;
 };
 const useIOT = filter => {
-  const { message: oldMessage, status, send, error } = useContext(context);
+  const {
+    message: oldMessage,
+    status,
+    send,
+    error,
+    messageObj,
+    messageText
+  } = useContext(context);
   const [message, setMessage] = useState(null);
   useEffect(() => {
     // if (!filter || micromatch(oldMessage, filter).isMatch())
     setMessage(oldMessage);
     // else setMessage(null);
   }, [oldMessage]);
-  return { message, status, send, error };
+  return { message, status, send, error, messageObj, messageText };
 };
 const useIOTSettings = ({
   region,
