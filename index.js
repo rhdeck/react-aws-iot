@@ -2,8 +2,6 @@ import React, { createContext, useState, useContext, useEffect } from "react";
 import { device } from "./aws-iot-device-sdk-js-react-native";
 const context = createContext({});
 const { Provider } = context;
-const port = 443;
-const protocol = "wss";
 const AWSIOTProvider = ({ children }) => {
   const [region, setRegion] = useState();
   const [accessKeyId, setAccessKeyId] = useState();
@@ -19,6 +17,8 @@ const AWSIOTProvider = ({ children }) => {
   const [client, setClient] = useState();
   const [send, setSend] = useState();
   const [error, setError] = useState();
+  const [port, setPort] = useState(443);
+  const [protocol, setProtocol] = useState("wss");
   useEffect(() => {
     if (
       !(
@@ -28,7 +28,8 @@ const AWSIOTProvider = ({ children }) => {
         secretKey &&
         sessionToken &&
         port &&
-        host
+        host &&
+        protocol
       )
     )
       return;
@@ -67,7 +68,16 @@ const AWSIOTProvider = ({ children }) => {
     });
     setClient(newClient);
     return () => newClient.close();
-  }, [region, accessKeyId, secretKey, sessionToken, host, iotTopic]);
+  }, [
+    region,
+    accessKeyId,
+    secretKey,
+    sessionToken,
+    host,
+    iotTopic,
+    port,
+    protocol
+  ]);
   useEffect(() => {
     setValue({
       setRegion,
@@ -76,6 +86,8 @@ const AWSIOTProvider = ({ children }) => {
       setSessionToken,
       setHost,
       setIotTopic,
+      setProtocol,
+      setPort,
       message,
       status,
       send,
@@ -110,7 +122,9 @@ const useIOTSettings = ({
   sessionToken,
   host,
   iotTopic,
-  topic
+  topic,
+  port,
+  protocol
 } = {}) => {
   const {
     setRegion,
@@ -118,13 +132,17 @@ const useIOTSettings = ({
     setSecretKey,
     setSessionToken,
     setHost,
-    setIotTopic
+    setIotTopic,
+    setPort,
+    setProtocol
   } = useContext(context);
-  setRegion(region);
-  setAccessKeyId(accessKeyId);
-  setSecretKey(secretKey);
-  setSessionToken(sessionToken);
-  setHost(host);
-  setIotTopic(iotTopic ? iotTopic : topic);
+  if (region) setRegion(region);
+  if (accessKeyId) setAccessKeyId(accessKeyId);
+  if (secretKey) setSecretKey(secretKey);
+  if (sessionToken) setSessionToken(sessionToken);
+  if (host) setHost(host);
+  if (iotTopic || topic) setIotTopic(iotTopic ? iotTopic : topic);
+  if (port) setPort(port);
+  if (protocol) setProtocol(protocol);
 };
 export { AWSIOTProvider, useIOT, useIOTSettings, context };
