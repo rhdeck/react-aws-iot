@@ -33,7 +33,7 @@ const AWSIOTProvider = ({ children }) => {
       )
     )
       return;
-    if (client) client.close();
+    if (client && client.close) client.close();
     const params = {
       region,
       protocol,
@@ -67,7 +67,7 @@ const AWSIOTProvider = ({ children }) => {
       newClient.publish(iotTopic, message); // send messages
     });
     setClient(newClient);
-    return () => newClient.close();
+    return () => newClient && newClient.close && newClient.close();
   }, [
     region,
     accessKeyId,
