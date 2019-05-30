@@ -45,6 +45,12 @@ const DataFetchingComponent = () => {
 ```js
 import { useIOT } from "react-aws-iot";
 const MessageAwareComponent = () => {
-  const { message, send, error, status } = useIOT();
+  const { message, send, error, status, messageText, messageObj } = useIOT();
 };
+```
+
+**Note** `messageObj` is a personal favorite because it has translated the raw bytearray to text (via `messageText`) and then decoded it as JSON. Makes a destructured view of the message a one-step process:
+
+```
+const { messageObj: { key, value} } = useIOT()
 ```
