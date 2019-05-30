@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 import { device } from "./aws-iot-device-sdk-js-react-native";
+import { TextDecoder } from "text-encoding";
 const context = createContext({});
 const { Provider } = context;
 const AWSIOTProvider = ({ children }) => {
@@ -19,6 +20,7 @@ const AWSIOTProvider = ({ children }) => {
   const [error, setError] = useState();
   const [port, setPort] = useState(443);
   const [protocol, setProtocol] = useState("wss");
+
   useEffect(() => {
     if (
       !(

@@ -26,7 +26,9 @@
   "peerDependencies": {
     "react": "*"
   },
-  "dependencies": {},
+  "dependencies": {
+    "text-encoding": "^0.7.0"
+  },
   "devDependencies": {
     "aws-iot-device-sdk": "^2.2.1",
     "uglify-js": "^3.4.9",
