@@ -1,64 +1,66 @@
-import React, { createContext, useState, useContext, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { device } from "./aws-iot-device-sdk-js-react-native";
 import { TextDecoder } from "text-encoding";
-const context = createContext({});
-const { Provider } = context;
-const AWSIOTProvider = ({ children }) => {
-  const [region, setRegion] = useState();
-  const [accessKeyId, setAccessKeyId] = useState();
-  const [secretKey, setSecretKey] = useState();
-  const [sessionToken, setSessionToken] = useState();
-  const [host, setHost] = useState();
-  const [iotTopic, setIotTopic] = useState();
-  const [status, setStatus] = useState("closed");
-  const [message, setMessage] = useState();
-  const [messageText, setMessageText] = useState("");
-  const [messageObj, setMessageObj] = useState(null);
-  const [value, setValue] = useState();
-  const [client, setClient] = useState();
-  const [send, setSend] = useState();
+//V2
+const clients = {};
+const useIot = ({
+  region,
+  accessKeyId,
+  secretKey,
+  sessionToken,
+  host,
+  iotTopic,
+  topic: oldTopic,
+  port,
+  protocol
+} = {}) => {
+  const topic = iotTopic ? iotTopic : oldTopic;
   const [error, setError] = useState();
-  const [port, setPort] = useState(443);
-  const [protocol, setProtocol] = useState("wss");
-
+  const [send, setSend] = useState();
+  const [message, setMessage] = useState();
+  const [messageText, setMessageText] = useState();
+  const [messageObj, setMessageObj] = useState();
   useEffect(() => {
-    if (
-      !(
-        region &&
-        protocol &&
-        accessKeyId &&
-        secretKey &&
-        sessionToken &&
-        port &&
-        host &&
-        protocol
-      )
-    )
-      return;
-    if (client && client.close) client.close();
-    const params = {
+    const hash = [
       region,
-      protocol,
       accessKeyId,
       secretKey,
       sessionToken,
+      host,
       port,
-      host
-    };
-    const newClient = device(params);
+      protocol
+    ].join();
+    if (!host) return;
+    const newClient = host
+      ? Object.values(clients)[0]
+      : clients[hash]
+      ? clients[hash]
+      : device({
+          region,
+          protocol,
+          accessKeyId,
+          secretKey,
+          sessionToken,
+          port,
+          host
+        });
+    if (!newClient) return;
+    clients[hash] = newClient;
     newClient.on("connect", () => {
       setStatus("connected");
-      newClient.subscribe(iotTopic);
+      newClient.subscribe(topic);
     });
     newClient.on("error", error => setError(error));
-    newClient.on("message", (topic, message) => {
-      setMessage(message);
-      const text = new TextDecoder().decode(message);
-      setMessageText(text);
-      try {
-        setMessageObj(JSON.parse(text));
-      } catch (e) {
-        setMessageObj(null);
+    newClient.on("message", (thisTopic, message) => {
+      if (!topic || thisTopic === topic) {
+        setMessage(message);
+        const text = new TextDecoder().decode(message);
+        setMessageText(text);
+        try {
+          setMessageObj(JSON.parse(text));
+        } catch (e) {
+          setMessageObj(null);
+        }
       }
     });
     newClient.on("close", () => {
@@ -66,10 +68,12 @@ const AWSIOTProvider = ({ children }) => {
       setClient(null);
     });
     setSend(message => {
-      newClient.publish(iotTopic, message); // send messages
+      newClient.publish(topic, message); // send messages
     });
-    setClient(newClient);
-    return () => newClient && newClient.close && newClient.close();
+    return () => {
+      if (newClient.close) newClient.close();
+      delete clients[hash];
+    };
   }, [
     region,
     accessKeyId,
@@ -77,74 +81,11 @@ const AWSIOTProvider = ({ children }) => {
     sessionToken,
     host,
     iotTopic,
+    oldTopic,
     port,
     protocol
   ]);
-  useEffect(() => {
-    setValue({
-      setRegion,
-      setAccessKeyId,
-      setSecretKey,
-      setSessionToken,
-      setHost,
-      setIotTopic,
-      setProtocol,
-      setPort,
-      message,
-      status,
-      send,
-      error,
-      messageObj,
-      messageText
-    });
-  }, [status, message, error, messageObj, messageText]);
-  return <Provider value={value}>{children}</Provider>;
+  return { send, message, messageText, messageObj, error };
 };
-const useIOT = filter => {
-  const {
-    message: oldMessage,
-    status,
-    send,
-    error,
-    messageObj,
-    messageText
-  } = useContext(context);
-  const [message, setMessage] = useState(null);
-  useEffect(() => {
-    // if (!filter || micromatch(oldMessage, filter).isMatch())
-    setMessage(oldMessage);
-    // else setMessage(null);
-  }, [oldMessage]);
-  return { message, status, send, error, messageObj, messageText };
-};
-const useIOTSettings = ({
-  region,
-  accessKeyId,
-  secretKey,
-  sessionToken,
-  host,
-  iotTopic,
-  topic,
-  port,
-  protocol
-} = {}) => {
-  const {
-    setRegion,
-    setAccessKeyId,
-    setSecretKey,
-    setSessionToken,
-    setHost,
-    setIotTopic,
-    setPort,
-    setProtocol
-  } = useContext(context);
-  if (region) setRegion(region);
-  if (accessKeyId) setAccessKeyId(accessKeyId);
-  if (secretKey) setSecretKey(secretKey);
-  if (sessionToken) setSessionToken(sessionToken);
-  if (host) setHost(host);
-  if (iotTopic || topic) setIotTopic(iotTopic ? iotTopic : topic);
-  if (port) setPort(port);
-  if (protocol) setProtocol(protocol);
-};
-export { AWSIOTProvider, useIOT, useIOTSettings, context };
+export { useIot };
+export default useIot;
