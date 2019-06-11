@@ -11,8 +11,8 @@ const useIot = ({
   host,
   iotTopic,
   topic: oldTopic,
-  port,
-  protocol
+  port = 443,
+  protocol = "wss"
 } = {}) => {
   const topic = iotTopic ? iotTopic : oldTopic;
   const [error, setError] = useState();
@@ -20,6 +20,7 @@ const useIot = ({
   const [message, setMessage] = useState();
   const [messageText, setMessageText] = useState();
   const [messageObj, setMessageObj] = useState();
+  const [status, setStatus] = useState("disconnected");
   useEffect(() => {
     const hash = [
       region,
@@ -31,19 +32,20 @@ const useIot = ({
       protocol
     ].join();
     if (!host) return;
-    const newClient = host
+    const o = {
+      region,
+      protocol,
+      accessKeyId,
+      secretKey,
+      sessionToken,
+      port,
+      host
+    };
+    const newClient = !host
       ? Object.values(clients)[0]
       : clients[hash]
       ? clients[hash]
-      : device({
-          region,
-          protocol,
-          accessKeyId,
-          secretKey,
-          sessionToken,
-          port,
-          host
-        });
+      : device(o);
     if (!newClient) return;
     clients[hash] = newClient;
     newClient.on("connect", () => {
@@ -85,7 +87,7 @@ const useIot = ({
     port,
     protocol
   ]);
-  return { send, message, messageText, messageObj, error };
+  return { send, message, messageText, messageObj, error, status };
 };
 export { useIot };
 export default useIot;
