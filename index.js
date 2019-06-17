@@ -67,7 +67,7 @@ const useIot = ({
     });
     newClient.on("close", () => {
       setStatus("closed");
-      setClient(null);
+      delete clients[hash];
     });
     setSend(message => {
       newClient.publish(topic, message); // send messages
