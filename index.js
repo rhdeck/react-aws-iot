@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { device } from "./aws-iot-device-sdk-js-react-native";
-import { decode } from "fastestsmallesttextencoderdecoder";
+import { TextDecoder } from "text-encoding";
 //V2
 const clients = {};
 const useIot = ({
@@ -56,7 +56,7 @@ const useIot = ({
     newClient.on("message", (thisTopic, message) => {
       if (!topic || thisTopic === topic) {
         setMessage(message);
-        const text = decode(message);
+        const text = new TextDecoder().decode(message);
         setMessageText(text);
         try {
           setMessageObj(JSON.parse(text));
