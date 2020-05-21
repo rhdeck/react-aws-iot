@@ -27,7 +27,7 @@
     "react": "*"
   },
   "dependencies": {
-    "text-encoding": "^0.7.0"
+    "fastestsmallesttextencoderdecoder": "^1.0.21"
   },
   "devDependencies": {
     "aws-iot-device-sdk": "^2.2.1",

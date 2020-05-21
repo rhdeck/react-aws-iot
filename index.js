@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { device } from "./aws-iot-device-sdk-js-react-native";
-import { TextDecoder } from "text-encoding";
+import { TextDecoder } from "fastestsmallesttextencoderdecoder";
 //V2
 const clients = {};
 const useIot = ({
@@ -12,7 +12,7 @@ const useIot = ({
   iotTopic,
   topic: oldTopic,
   port = 443,
-  protocol = "wss"
+  protocol = "wss",
 } = {}) => {
   const topic = iotTopic ? iotTopic : oldTopic;
   const [error, setError] = useState();
@@ -29,7 +29,7 @@ const useIot = ({
       sessionToken,
       host,
       port,
-      protocol
+      protocol,
     ].join();
     if (!host) return;
     const o = {
@@ -39,7 +39,7 @@ const useIot = ({
       secretKey,
       sessionToken,
       port,
-      host
+      host,
     };
     const newClient = !host
       ? Object.values(clients)[0]
@@ -52,7 +52,7 @@ const useIot = ({
       setStatus("connected");
       newClient.subscribe(topic);
     });
-    newClient.on("error", error => setError(error));
+    newClient.on("error", (error) => setError(error));
     newClient.on("message", (thisTopic, message) => {
       if (!topic || thisTopic === topic) {
         setMessage(message);
@@ -69,7 +69,7 @@ const useIot = ({
       setStatus("closed");
       delete clients[hash];
     });
-    setSend(message => {
+    setSend((message) => {
       newClient.publish(topic, message); // send messages
     });
     return () => {
@@ -85,7 +85,7 @@ const useIot = ({
     iotTopic,
     oldTopic,
     port,
-    protocol
+    protocol,
   ]);
   return { send, message, messageText, messageObj, error, status };
 };
