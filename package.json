@@ -1,6 +1,6 @@
 {
   "name": "react-aws-iot",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "Hooks interface for AWS MQTT over IOT service",
   "main": "index.js",
   "scripts": {
